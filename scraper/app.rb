@@ -1,16 +1,36 @@
 # require 'httparty'
 require 'json'
 require 'selenium-webdriver'
+require 'base64'
 
 def lambda_handler(event:, context:)
   driver = setup_driver
+
+  # Go to Google.com
   driver.navigate.to 'http://www.google.com'
-  element = driver.find_element(name: 'q')
-  element.send_keys 'Pizza'
-  element.submit
-  title = driver.title
+
+  # Search for whatever query is specified.
+  if event && event['queryStringParameters']['q'] && event['queryStringParameters']['q']
+    element = driver.find_element(name: 'q')
+    element.send_keys event['queryStringParameters']['q']
+    element.submit
+  end
+
+  # Take a screenshot.
+  screenshot_filename = '/tmp/screenshot.png'
+  driver.save_screenshot(screenshot_filename)
   driver.quit
-  { statusCode: 200, body: JSON.generate(title) }
+
+  # Return the screenshot as the HTTP response.
+  body = Base64.encode64(File.open(screenshot_filename, 'rb').read)
+  {
+    statusCode: 200,
+    headers: {
+      'Content-Type': 'image/png'
+    },
+    body: body,
+    isBase64Encoded: true
+  }
 end
 
 def setup_driver

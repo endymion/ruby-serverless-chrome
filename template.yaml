@@ -3,12 +3,12 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   ruby-serverless-chrome
 
-  Sample SAM Template for ruby-serverless-chrome
+  SAM Template for running a headless web scraper with Ruby in AWS Lambda.
 
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
-  Function:
-    Timeout: 3
+  Api:
+    BinaryMediaTypes:
+      - "*~1*"
 
 Resources:
   ScraperFunction:
@@ -18,9 +18,9 @@ Resources:
       Handler: app.lambda_handler
       Runtime: ruby2.5
       MemorySize: 512
-      Timeout: 60
+      Timeout: 30
       Events:
-        HelloWorld:
+        Scrape:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
             Path: /scrape
